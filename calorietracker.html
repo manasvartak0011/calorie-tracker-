@@ -1,0 +1,1353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NutriTrack - Calorie Tracker</title>
+    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            transition: background 0.3s, color 0.3s;
+        }
+        
+        :root {
+            --bg: #f5f7fa;
+            --card: #fff;
+            --text: #333;
+            --primary: #4a6cf7;
+            --secondary: #777;
+            --border: #eaeaea;
+            --progress-bg: #eaeaea;
+            --nutrient-bg: #f8f9ff;
+            --danger: #ff6b6b;
+            --success: #6aeb8a;
+        }
+        
+        body.dark {
+            --bg: #1e1e1e;
+            --card: #2a2a2a;
+            --text: #f5f5f5;
+            --primary: #90caf9;
+            --secondary: #bbb;
+            --border: #444;
+            --progress-bg: #444;
+            --nutrient-bg: #3a3a3a;
+            --danger: #ff6b6b;
+            --success: #6aeb8a;
+        }
+        
+        .app-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .logo i {
+            font-size: 28px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: var(--card);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            padding: 25px;
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text);
+        }
+        
+        .card-action {
+            color: var(--primary);
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .calorie-progress {
+            margin-bottom: 20px;
+        }
+        
+        .progress-bar {
+            height: 10px;
+            background-color: var(--progress-bg);
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), #6a8aff);
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+        
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: var(--secondary);
+        }
+        
+        .nutrient-cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .nutrient-card {
+            text-align: center;
+            padding: 15px 10px;
+            border-radius: 8px;
+            background-color: var(--nutrient-bg);
+        }
+        
+        .nutrient-value {
+            font-size: 20px;
+            font-weight: 700;
+            margin: 5px 0;
+            color: var(--text);
+        }
+        
+        .nutrient-name {
+            font-size: 12px;
+            color: var(--secondary);
+        }
+        
+        .food-log {
+            margin-top: 20px;
+        }
+        
+        .food-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .food-details {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .food-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #f0f5ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+        }
+        
+        .food-info h4 {
+            font-size: 16px;
+            margin-bottom: 5px;
+            color: var(--text);
+        }
+        
+        .food-info p {
+            font-size: 14px;
+            color: var(--secondary);
+        }
+        
+        .food-calories {
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        .add-food-form {
+            background: var(--card);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .form-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--text);
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border 0.3s;
+            background: var(--card);
+            color: var(--text);
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        .btn-block {
+            width: 100%;
+        }
+        
+        .food-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--secondary);
+        }
+        
+        .empty-state i {
+            font-size: 50px;
+            margin-bottom: 15px;
+            color: var(--border);
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--secondary);
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .tab.active {
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary);
+        }
+        
+        .chart-container {
+            height: 250px;
+            margin-top: 20px;
+        }
+        
+        .chart-bar {
+            display: flex;
+            align-items: flex-end;
+            height: 200px;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .chart-bar-item {
+            flex: 1;
+            background: linear-gradient(to top, var(--primary), #6a8aff);
+            border-radius: 4px 4px 0 0;
+            position: relative;
+        }
+        
+        .chart-label {
+            text-align: center;
+            font-size: 12px;
+            color: var(--secondary);
+            margin-top: 5px;
+        }
+        
+        .goal-line {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: var(--danger);
+        }
+        
+        .goal-label {
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--danger);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+        
+        .health-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .bmi-indicator {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+        
+        .bmi-scale {
+            flex: 1;
+            height: 10px;
+            background: linear-gradient(90deg, #4a6cf7, #6aeb8a, #ff9a76, var(--danger));
+            border-radius: 5px;
+            margin: 0 10px;
+            position: relative;
+        }
+        
+        .bmi-marker {
+            position: absolute;
+            top: -5px;
+            width: 4px;
+            height: 20px;
+            background: var(--text);
+            transform: translateX(-50%);
+        }
+        
+        .quick-foods {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .quick-food-btn {
+            padding: 8px 12px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .quick-food-btn:hover {
+            opacity: 0.9;
+        }
+
+        .search-box {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--secondary);
+        }
+
+        .search-box input {
+            padding-left: 40px;
+        }
+
+        .food-database-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .food-database-item:last-child {
+            border-bottom: none;
+        }
+
+        .food-database-info {
+            flex: 1;
+        }
+
+        .food-database-info h4 {
+            font-size: 14px;
+            margin-bottom: 4px;
+            color: var(--text);
+        }
+
+        .food-database-info p {
+            font-size: 12px;
+            color: var(--secondary);
+        }
+
+        .add-food-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .serving-input {
+            width: 60px;
+            padding: 6px 8px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .nutrient-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+            
+            .user-info {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .health-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .quick-foods {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // Indian Foods Database
+        const indianFoods = [
+            { id: 1, name: "Roti (1 piece)", calories: 80, protein: 3, carbs: 15, fat: 1 },
+            { id: 2, name: "Dal (1 cup)", calories: 198, protein: 12, carbs: 26, fat: 6 },
+            { id: 3, name: "Paneer (100g)", calories: 265, protein: 18, carbs: 6, fat: 20 },
+            { id: 4, name: "Rice (1 cup)", calories: 205, protein: 4.2, carbs: 45, fat: 0.4 },
+            { id: 5, name: "Chicken Curry (1 cup)", calories: 300, protein: 27, carbs: 7, fat: 18 },
+            { id: 6, name: "Idli (1 piece)", calories: 39, protein: 1.6, carbs: 8, fat: 0.2 },
+            { id: 7, name: "Dosa (1 piece)", calories: 133, protein: 2.7, carbs: 25, fat: 3.7 },
+            { id: 8, name: "Poha (1 cup)", calories: 250, protein: 5, carbs: 45, fat: 6 },
+            { id: 9, name: "Upma (1 cup)", calories: 220, protein: 6, carbs: 44, fat: 4 },
+            { id: 10, name: "Biryani (1 cup)", calories: 290, protein: 9, carbs: 45, fat: 9 },
+            { id: 11, name: "Paratha (1 piece)", calories: 210, protein: 5, carbs: 30, fat: 9 },
+            { id: 12, name: "Chole (1 cup)", calories: 280, protein: 15, carbs: 40, fat: 8 },
+            { id: 13, name: "Rajma (1 cup)", calories: 260, protein: 15, carbs: 35, fat: 6 },
+            { id: 14, name: "Aloo Sabzi (1 cup)", calories: 180, protein: 3, carbs: 30, fat: 6 },
+            { id: 15, name: "Bhindi Sabzi (1 cup)", calories: 90, protein: 2, carbs: 10, fat: 5 },
+            { id: 16, name: "Fish Curry (1 cup)", calories: 240, protein: 22, carbs: 4, fat: 14 },
+            { id: 17, name: "Egg Curry (1 cup)", calories: 230, protein: 14, carbs: 6, fat: 15 },
+            { id: 18, name: "Pav Bhaji (1 plate)", calories: 400, protein: 8, carbs: 60, fat: 15 },
+            { id: 19, name: "Samosa (1 piece)", calories: 150, protein: 3, carbs: 20, fat: 8 },
+            { id: 20, name: "Pakora (100g)", calories: 300, protein: 8, carbs: 25, fat: 20 }
+        ];
+
+        // Format date to YYYY-MM-DD
+        const formatDate = (date) => {
+            return date.toISOString().split('T')[0];
+        };
+
+        // Main App Component
+        function App() {
+            const [foodLog, setFoodLog] = useState([]);
+            const [dailyGoal, setDailyGoal] = useState(2000);
+            const [activeTab, setActiveTab] = useState('today');
+            const [selectedDate, setSelectedDate] = useState(formatDate(new Date()));
+            const [darkMode, setDarkMode] = useState(false);
+            
+            // BMI states
+            const [height, setHeight] = useState(170);
+            const [weight, setWeight] = useState(70);
+            const [age, setAge] = useState(30);
+            const [gender, setGender] = useState('male');
+            const [activityLevel, setActivityLevel] = useState(1.2);
+            
+            // Calculate BMI
+            const bmi = weight / ((height / 100) ** 2);
+            const bmiCategory = bmi < 18.5 ? "Underweight" : bmi < 25 ? "Normal" : bmi < 30 ? "Overweight" : "Obese";
+            
+            // Calculate maintenance calories (Harris-Benedict formula)
+            const bmr = gender === 'male' 
+                ? 88.362 + (13.397 * weight) + (4.799 * height) - (5.677 * age)
+                : 447.593 + (9.247 * weight) + (3.098 * height) - (4.330 * age);
+            
+            const maintenanceCalories = Math.round(bmr * activityLevel);
+            
+            // Initialize with some sample data for demonstration
+            useEffect(() => {
+                const today = formatDate(new Date());
+                const yesterday = formatDate(new Date(Date.now() - 86400000));
+                
+                const sampleData = [
+                    {
+                        id: 1,
+                        name: "Roti (2 pieces)",
+                        calories: 160,
+                        protein: 6,
+                        carbs: 30,
+                        fat: 2,
+                        servings: 2,
+                        date: today
+                    },
+                    {
+                        id: 2,
+                        name: "Dal (1 cup)",
+                        calories: 198,
+                        protein: 12,
+                        carbs: 26,
+                        fat: 6,
+                        servings: 1,
+                        date: today
+                    }
+                ];
+                
+                setFoodLog(sampleData);
+                setDailyGoal(maintenanceCalories);
+            }, []);
+            
+            // Calculate totals for the selected date
+            const totals = foodLog.reduce((acc, item) => {
+                if (item.date === selectedDate) {
+                    acc.calories += item.calories;
+                    acc.protein += item.protein;
+                    acc.carbs += item.carbs;
+                    acc.fat += item.fat;
+                }
+                return acc;
+            }, { calories: 0, protein: 0, carbs: 0, fat: 0 });
+            
+            // Calculate calorie progress percentage
+            const calorieProgress = dailyGoal > 0 ? Math.min((totals.calories / dailyGoal) * 100, 100) : 0;
+            
+            // Add food to log
+            const addFoodToLog = (food, servings) => {
+                const newFoodItem = {
+                    id: Date.now(),
+                    name: food.name,
+                    calories: Math.round(food.calories * servings),
+                    protein: Math.round(food.protein * servings * 10) / 10,
+                    carbs: Math.round(food.carbs * servings * 10) / 10,
+                    fat: Math.round(food.fat * servings * 10) / 10,
+                    servings: servings,
+                    date: selectedDate
+                };
+                
+                setFoodLog([...foodLog, newFoodItem]);
+            };
+            
+            // Remove food from log
+            const removeFoodFromLog = (id) => {
+                setFoodLog(foodLog.filter(item => item.id !== id));
+            };
+            
+            // Get unique dates from food log for the chart
+            const getLast7Days = () => {
+                const dates = [];
+                for (let i = 6; i >= 0; i--) {
+                    const date = new Date();
+                    date.setDate(date.getDate() - i);
+                    dates.push(formatDate(date));
+                }
+                return dates;
+            };
+            
+            const last7Days = getLast7Days();
+            
+            // Calculate calories for each of the last 7 days
+            const weeklyCalories = last7Days.map(date => {
+                return foodLog
+                    .filter(item => item.date === date)
+                    .reduce((sum, item) => sum + item.calories, 0);
+            });
+            
+            // Find the max value for scaling the chart
+            const maxCalories = Math.max(...weeklyCalories, dailyGoal) || 1;
+            
+            // Toggle dark mode
+            useEffect(() => {
+                document.body.classList.toggle("dark", darkMode);
+            }, [darkMode]);
+            
+            return (
+                <div className="app-container">
+                    <Header 
+                        dailyGoal={dailyGoal} 
+                        setDailyGoal={setDailyGoal}
+                        selectedDate={selectedDate}
+                        setSelectedDate={setSelectedDate}
+                        darkMode={darkMode}
+                        setDarkMode={setDarkMode}
+                    />
+                    
+                    <HealthStats 
+                        height={height}
+                        setHeight={setHeight}
+                        weight={weight}
+                        setWeight={setWeight}
+                        age={age}
+                        setAge={setAge}
+                        gender={gender}
+                        setGender={setGender}
+                        activityLevel={activityLevel}
+                        setActivityLevel={setActivityLevel}
+                        bmi={bmi}
+                        bmiCategory={bmiCategory}
+                        maintenanceCalories={maintenanceCalories}
+                        setDailyGoal={setDailyGoal}
+                    />
+                    
+                    <div className="dashboard">
+                        <CalorieSummary 
+                            calorieProgress={calorieProgress}
+                            totals={totals}
+                            dailyGoal={dailyGoal}
+                        />
+                        
+                        <NutritionBreakdown totals={totals} />
+                    </div>
+                    
+                    <div className="tabs">
+                        {['today', 'add', 'progress'].map(tab => (
+                            <div 
+                                key={tab}
+                                className={`tab ${activeTab === tab ? 'active' : ''}`}
+                                onClick={() => setActiveTab(tab)}
+                            >
+                                {tab === 'today' ? "Today's Food" : 
+                                 tab === 'add' ? "Add Food" : "Progress"}
+                            </div>
+                        ))}
+                    </div>
+                    
+                    {activeTab === 'today' && (
+                        <FoodLog 
+                            foodLog={foodLog.filter(item => item.date === selectedDate)}
+                            removeFoodFromLog={removeFoodFromLog}
+                            selectedDate={selectedDate}
+                        />
+                    )}
+                    
+                    {activeTab === 'add' && (
+                        <AddFoodForm 
+                            foodDatabase={indianFoods}
+                            addFoodToLog={addFoodToLog}
+                        />
+                    )}
+                    
+                    {activeTab === 'progress' && (
+                        <ProgressChart 
+                            weeklyCalories={weeklyCalories}
+                            last7Days={last7Days}
+                            maxCalories={maxCalories}
+                            dailyGoal={dailyGoal}
+                        />
+                    )}
+                </div>
+            );
+        }
+        
+        // Header Component
+        function Header({ dailyGoal, setDailyGoal, selectedDate, setSelectedDate, darkMode, setDarkMode }) {
+            const [isEditing, setIsEditing] = useState(false);
+            const [tempGoal, setTempGoal] = useState(dailyGoal);
+            
+            useEffect(() => {
+                setTempGoal(dailyGoal);
+            }, [dailyGoal]);
+            
+            const handleGoalSubmit = (e) => {
+                e.preventDefault();
+                if (tempGoal > 0) {
+                    setDailyGoal(tempGoal);
+                    setIsEditing(false);
+                }
+            };
+            
+            const handleCancelEdit = () => {
+                setTempGoal(dailyGoal);
+                setIsEditing(false);
+            };
+            
+            return (
+                <header>
+                    <div className="logo">
+                        <i className="fas fa-apple-alt"></i>
+                        <span>NutriTrack</span>
+                    </div>
+                    
+                    <div className="user-info">
+                        <button className="btn btn-secondary" onClick={() => setDarkMode(!darkMode)}>
+                            {darkMode ? <i className="fas fa-sun"></i> : <i className="fas fa-moon"></i>}
+                            {darkMode ? " Light" : " Dark"}
+                        </button>
+                        
+                        <div className="date-picker">
+                            <input 
+                                type="date" 
+                                value={selectedDate}
+                                onChange={(e) => setSelectedDate(e.target.value)}
+                                className="form-control"
+                                style={{width: '150px'}}
+                                max={formatDate(new Date())}
+                            />
+                        </div>
+                        
+                        <div className="daily-goal">
+                            {isEditing ? (
+                                <form onSubmit={handleGoalSubmit} style={{display: 'flex', gap: '10px', alignItems: 'center'}}>
+                                    <input 
+                                        type="number" 
+                                        value={tempGoal}
+                                        onChange={(e) => setTempGoal(parseInt(e.target.value) || 0)}
+                                        className="form-control"
+                                        style={{width: '100px'}}
+                                        min="0"
+                                        autoFocus
+                                    />
+                                    <button type="submit" className="btn btn-primary" style={{padding: '8px 12px'}}>
+                                        <i className="fas fa-check"></i>
+                                    </button>
+                                    <button 
+                                        type="button" 
+                                        className="btn btn-secondary" 
+                                        style={{padding: '8px 12px'}}
+                                        onClick={handleCancelEdit}
+                                    >
+                                        <i className="fas fa-times"></i>
+                                    </button>
+                                </form>
+                            ) : (
+                                <div 
+                                    style={{display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer'}}
+                                    onClick={() => setIsEditing(true)}
+                                    title="Click to edit daily goal"
+                                >
+                                    <span>Goal: {dailyGoal} kcal</span>
+                                    <i className="fas fa-edit" style={{color: 'var(--primary)'}}></i>
+                                </div>
+                            )}
+                        </div>
+                        
+                        <div className="user-avatar">MV</div>
+                    </div>
+                </header>
+            );
+        }
+        
+        // Health Stats Component
+        function HealthStats({
+            height, setHeight, weight, setWeight, age, setAge, 
+            gender, setGender, activityLevel, setActivityLevel,
+            bmi, bmiCategory, maintenanceCalories, setDailyGoal
+        }) {
+            const activityLevels = [
+                { value: 1.2, label: "Sedentary (little or no exercise)" },
+                { value: 1.375, label: "Lightly active (light exercise 1-3 days/week)" },
+                { value: 1.55, label: "Moderately active (moderate exercise 3-5 days/week)" },
+                { value: 1.725, label: "Very active (hard exercise 6-7 days/week)" },
+                { value: 1.9, label: "Extremely active (very hard exercise, physical job)" }
+            ];
+            
+            const bmiPosition = ((bmi - 15) / (40 - 15)) * 100; // Scale from 15 to 40
+            
+            return (
+                <div className="health-stats">
+                    <div className="card">
+                        <div className="card-title">Health Statistics</div>
+                        <div className="form-grid">
+                            <div className="form-group">
+                                <label>Height (cm)</label>
+                                <input 
+                                    type="number" 
+                                    value={height} 
+                                    onChange={e => setHeight(+e.target.value)}
+                                    className="form-control"
+                                    min="100"
+                                    max="250"
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label>Weight (kg)</label>
+                                <input 
+                                    type="number" 
+                                    value={weight} 
+                                    onChange={e => setWeight(+e.target.value)}
+                                    className="form-control"
+                                    min="30"
+                                    max="200"
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label>Age</label>
+                                <input 
+                                    type="number" 
+                                    value={age} 
+                                    onChange={e => setAge(+e.target.value)}
+                                    className="form-control"
+                                    min="15"
+                                    max="100"
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label>Gender</label>
+                                <select 
+                                    value={gender} 
+                                    onChange={e => setGender(e.target.value)}
+                                    className="form-control"
+                                >
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div className="form-group">
+                            <label>Activity Level</label>
+                            <select 
+                                value={activityLevel} 
+                                onChange={e => setActivityLevel(parseFloat(e.target.value))}
+                                className="form-control"
+                            >
+                                {activityLevels.map(level => (
+                                    <option key={level.value} value={level.value}>
+                                        {level.label}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div className="card">
+                        <div className="card-title">Health Insights</div>
+                        <p><b>BMI:</b> {bmi.toFixed(1)} ({bmiCategory})</p>
+                        
+                        <div className="bmi-indicator">
+                            <span>15</span>
+                            <div className="bmi-scale">
+                                <div 
+                                    className="bmi-marker" 
+                                    style={{ left: `${Math.min(Math.max(bmiPosition, 0), 100)}%` }}
+                                ></div>
+                            </div>
+                            <span>40</span>
+                        </div>
+                        
+                        <p style={{marginTop: '10px'}}>
+                            <b>Maintenance Calories:</b> {maintenanceCalories} kcal/day
+                        </p>
+                        
+                        <button 
+                            className="btn btn-primary" 
+                            style={{marginTop: '15px'}}
+                            onClick={() => setDailyGoal(maintenanceCalories)}
+                        >
+                            Set as Daily Goal
+                        </button>
+                    </div>
+                </div>
+            );
+        }
+        
+        // Calorie Summary Component
+        function CalorieSummary({ calorieProgress, totals, dailyGoal }) {
+            return (
+                <div className="card">
+                    <div className="card-header">
+                        <div className="card-title">Calorie Summary</div>
+                        <div className="card-action">Details</div>
+                    </div>
+                    
+                    <div className="calorie-progress">
+                        <div className="progress-bar">
+                            <div 
+                                className="progress-fill" 
+                                style={{ width: `${calorieProgress}%` }}
+                            ></div>
+                        </div>
+                        <div className="progress-info">
+                            <span>Consumed: {totals.calories} kcal</span>
+                            <span>Goal: {dailyGoal} kcal</span>
+                        </div>
+                        <div className="progress-info">
+                            <span>Remaining: {Math.max(0, dailyGoal - totals.calories)} kcal</span>
+                            <span>{calorieProgress.toFixed(1)}% of goal</span>
+                        </div>
+                    </div>
+                    
+                    <div className="nutrient-cards">
+                        <div className="nutrient-card">
+                            <div className="nutrient-value">{totals.protein.toFixed(1)}g</div>
+                            <div className="nutrient-name">Protein</div>
+                        </div>
+                        <div className="nutrient-card">
+                            <div className="nutrient-value">{totals.carbs.toFixed(1)}g</div>
+                            <div className="nutrient-name">Carbs</div>
+                        </div>
+                        <div className="nutrient-card">
+                            <div className="nutrient-value">{totals.fat.toFixed(1)}g</div>
+                            <div className="nutrient-name">Fat</div>
+                        </div>
+                        <div className="nutrient-card">
+                            <div className="nutrient-value">
+                                {dailyGoal > 0 ? Math.round((totals.calories / dailyGoal) * 100) : 0}%
+                            </div>
+                            <div className="nutrient-name">Progress</div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+        
+        // Nutrition Breakdown Component
+        function NutritionBreakdown({ totals }) {
+            const totalMacros = totals.protein + totals.carbs + totals.fat;
+            const proteinPercent = totalMacros > 0 ? (totals.protein / totalMacros) * 100 : 0;
+            const carbsPercent = totalMacros > 0 ? (totals.carbs / totalMacros) * 100 : 0;
+            const fatPercent = totalMacros > 0 ? (totals.fat / totalMacros) * 100 : 0;
+            
+            return (
+                <div className="card">
+                    <div className="card-header">
+                        <div className="card-title">Nutrition Breakdown</div>
+                        <div className="card-action">View Details</div>
+                    </div>
+                    
+                    <div className="nutrient-cards">
+                        <div className="nutrient-card">
+                            <div className="nutrient-value">{totals.protein.toFixed(1)}g</div>
+                            <div className="nutrient-name">Protein ({proteinPercent.toFixed(0)}%)</div>
+                            <div className="progress-bar" style={{marginTop: '10px', height: '6px'}}>
+                                <div 
+                                    className="progress-fill" 
+                                    style={{ 
+                                        width: `${proteinPercent}%`,
+                                        background: '#ff6b6b'
+                                    }}
+                                ></div>
+                            </div>
+                        </div>
+                        
+                        <div className="nutrient-card">
+                            <div className="nutrient-value">{totals.carbs.toFixed(1)}g</div>
+                            <div className="nutrient-name">Carbs ({carbsPercent.toFixed(0)}%)</div>
+                            <div className="progress-bar" style={{marginTop: '10px', height: '6px'}}>
+                                <div 
+                                    className="progress-fill" 
+                                    style={{ 
+                                        width: `${carbsPercent}%`,
+                                        background: '#6aeb8a'
+                                    }}
+                                ></div>
+                            </div>
+                        </div>
+                        
+                        <div className="nutrient-card">
+                            <div className="nutrient-value">{totals.fat.toFixed(1)}g</div>
+                            <div className="nutrient-name">Fat ({fatPercent.toFixed(0)}%)</div>
+                            <div className="progress-bar" style={{marginTop: '10px', height: '6px'}}>
+                                <div 
+                                    className="progress-fill" 
+                                    style={{ 
+                                        width: `${fatPercent}%`,
+                                        background: '#ffa726'
+                                    }}
+                                ></div>
+                            </div>
+                        </div>
+                        
+                        <div className="nutrient-card">
+                            <div className="nutrient-value">{totals.calories}</div>
+                            <div className="nutrient-name">Total Calories</div>
+                            <div style={{marginTop: '10px', fontSize: '12px', color: 'var(--secondary)'}}>
+                                {(totals.protein * 4 + totals.carbs * 4 + totals.fat * 9).toFixed(0)} calculated
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+        
+        // Food Log Component
+        function FoodLog({ foodLog, removeFoodFromLog }) {
+            if (foodLog.length === 0) {
+                return (
+                    <div className="card">
+                        <div className="empty-state">
+                            <i className="fas fa-utensils"></i>
+                            <h3>No food logged today</h3>
+                            <p>Start tracking your meals by adding foods from the "Add Food" tab.</p>
+                        </div>
+                    </div>
+                );
+            }
+            
+            return (
+                <div className="card">
+                    <div className="card-header">
+                        <div className="card-title">Food Log ({foodLog.length} items)</div>
+                        <div className="card-action">Clear All</div>
+                    </div>
+                    
+                    <div className="food-list">
+                        {foodLog.map(item => (
+                            <div key={item.id} className="food-item">
+                                <div className="food-details">
+                                    <div className="food-icon">
+                                        <i className="fas fa-utensils"></i>
+                                    </div>
+                                    <div className="food-info">
+                                        <h4>{item.name}</h4>
+                                        <p>
+                                            {item.servings} serving{item.servings !== 1 ? 's' : ''} • 
+                                            P: {item.protein}g, C: {item.carbs}g, F: {item.fat}g
+                                        </p>
+                                    </div>
+                                </div>
+                                <div style={{display: 'flex', alignItems: 'center', gap: '15px'}}>
+                                    <div className="food-calories">{item.calories} kcal</div>
+                                    <button 
+                                        className="btn btn-danger btn-sm"
+                                        onClick={() => removeFoodFromLog(item.id)}
+                                        title="Remove from log"
+                                    >
+                                        <i className="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        }
+        
+        // Add Food Form Component
+        function AddFoodForm({ foodDatabase, addFoodToLog }) {
+            const [searchTerm, setSearchTerm] = useState('');
+            const [servings, setServings] = useState({});
+            
+            const filteredFoods = foodDatabase.filter(food =>
+                food.name.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+            
+            const handleAddFood = (food) => {
+                const servingAmount = servings[food.id] || 1;
+                addFoodToLog(food, servingAmount);
+                
+                // Reset serving amount after adding
+                setServings(prev => ({
+                    ...prev,
+                    [food.id]: 1
+                }));
+            };
+            
+            const handleServingChange = (foodId, value) => {
+                setServings(prev => ({
+                    ...prev,
+                    [foodId]: Math.max(0.1, parseFloat(value) || 1)
+                }));
+            };
+            
+            const quickFoods = [
+                { name: "Roti", id: 1 },
+                { name: "Dal", id: 2 },
+                { name: "Rice", id: 4 },
+                { name: "Paneer", id: 3 },
+                { name: "Chicken Curry", id: 5 },
+                { name: "Idli", id: 6 }
+            ];
+            
+            return (
+                <div className="add-food-form">
+                    <div className="form-title">Add Food to Log</div>
+                    
+                    <div className="quick-foods">
+                        {quickFoods.map(quickFood => {
+                            const food = foodDatabase.find(f => f.id === quickFood.id);
+                            return (
+                                <button 
+                                    key={quickFood.id}
+                                    className="quick-food-btn"
+                                    onClick={() => handleAddFood(food)}
+                                >
+                                    {quickFood.name}
+                                </button>
+                            );
+                        })}
+                    </div>
+                    
+                    <div className="search-box">
+                        <i className="fas fa-search"></i>
+                        <input 
+                            type="text"
+                            placeholder="Search for Indian foods..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="form-control"
+                        />
+                    </div>
+                    
+                    <div className="card">
+                        <div className="card-title">Food Database ({filteredFoods.length} items)</div>
+                        
+                        <div className="food-list">
+                            {filteredFoods.length === 0 ? (
+                                <div className="empty-state">
+                                    <i className="fas fa-search"></i>
+                                    <p>No foods found matching "{searchTerm}"</p>
+                                </div>
+                            ) : (
+                                filteredFoods.map(food => (
+                                    <div key={food.id} className="food-database-item">
+                                        <div className="food-database-info">
+                                            <h4>{food.name}</h4>
+                                            <p>
+                                                {food.calories} kcal • P: {food.protein}g, C: {food.carbs}g, F: {food.fat}g
+                                            </p>
+                                        </div>
+                                        <div className="add-food-controls">
+                                            <input 
+                                                type="number"
+                                                min="0.1"
+                                                step="0.1"
+                                                value={servings[food.id] || 1}
+                                                onChange={(e) => handleServingChange(food.id, e.target.value)}
+                                                className="serving-input"
+                                            />
+                                            <button 
+                                                className="btn btn-primary btn-sm"
+                                                onClick={() => handleAddFood(food)}
+                                            >
+                                                <i className="fas fa-plus"></i> Add
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+        
+        // Progress Chart Component
+        function ProgressChart({ weeklyCalories, last7Days, maxCalories, dailyGoal }) {
+            const goalPercentage = dailyGoal > 0 ? (dailyGoal / maxCalories) * 100 : 0;
+            
+            return (
+                <div className="card">
+                    <div className="card-title">7-Day Progress</div>
+                    
+                    <div className="chart-container">
+                        <div className="chart-bar">
+                            {weeklyCalories.map((calories, index) => {
+                                const height = maxCalories > 0 ? (calories / maxCalories) * 100 : 0;
+                                const isToday = last7Days[index] === formatDate(new Date());
+                                
+                                return (
+                                    <div key={index} className="chart-bar-item" style={{height: `${height}%`}}>
+                                        {index === 0 && (
+                                            <>
+                                                <div 
+                                                    className="goal-line" 
+                                                    style={{bottom: `${goalPercentage}%`}}
+                                                ></div>
+                                                <div 
+                                                    className="goal-label" 
+                                                    style={{bottom: `${goalPercentage}%`}}
+                                                >
+                                                    Goal: {dailyGoal}
+                                                </div>
+                                            </>
+                                        )}
+                                        <div style={{
+                                            position: 'absolute',
+                                            top: '-25px',
+                                            left: '50%',
+                                            transform: 'translateX(-50%)',
+                                            fontSize: '12px',
+                                            fontWeight: 'bold',
+                                            color: isToday ? 'var(--primary)' : 'var(--text)'
+                                        }}>
+                                            {calories}
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                        
+                        <div style={{display: 'flex', gap: '10px'}}>
+                            {last7Days.map((date, index) => {
+                                const dayName = new Date(date).toLocaleDateString('en-US', { weekday: 'short' });
+                                const isToday = date === formatDate(new Date());
+                                
+                                return (
+                                    <div 
+                                        key={index} 
+                                        className="chart-label" 
+                                        style={{
+                                            flex: 1,
+                                            fontWeight: isToday ? 'bold' : 'normal',
+                                            color: isToday ? 'var(--primary)' : 'var(--secondary)'
+                                        }}
+                                    >
+                                        {dayName}
+                                    </div>
+                                );
+                            })}
+                        </div>
+                        
+                        <div style={{marginTop: '20px', padding: '15px', backgroundColor: 'var(--nutrient-bg)', borderRadius: '8px'}}>
+                            <h4 style={{marginBottom: '10px'}}>Weekly Summary</h4>
+                            <div style={{display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px', fontSize: '14px'}}>
+                                <div>Average: {Math.round(weeklyCalories.reduce((a, b) => a + b, 0) / 7)} kcal/day</div>
+                                <div>Total: {weeklyCalories.reduce((a, b) => a + b, 0)} kcal</div>
+                                <div>Days on target: {weeklyCalories.filter(cal => cal >= dailyGoal * 0.9 && cal <= dailyGoal * 1.1).length}/7</div>
+                                <div>Highest: {Math.max(...weeklyCalories)} kcal</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+        
+        // Render the app
+        ReactDOM.render(<App />, document.getElementById('root'));
